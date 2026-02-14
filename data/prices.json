@@ -1,0 +1,63 @@
+{
+  "prices": {
+    "enchanted": {
+      "auction": null,
+      "source": "auction",
+      "timestamp": 1771107978761,
+      "itemName": "Enchanted",
+      "lastUpdated": "2026-02-14T22:26:18.761Z"
+    },
+    "enchanted_bone": {
+      "auction": 750.4,
+      "bazaarSellPrice": 750.4,
+      "bazaarBuyPrice": 884.6,
+      "source": "bazaar",
+      "timestamp": 1771108009546,
+      "itemName": "Enchanted Bone",
+      "lastUpdated": "2026-02-14T22:26:49.546Z"
+    },
+    "dragon_egg": {
+      "auction": null,
+      "source": "auction",
+      "timestamp": 1771108016193,
+      "itemName": "Dragon Egg",
+      "lastUpdated": "2026-02-14T22:26:56.193Z"
+    },
+    "wheat": {
+      "auction": 4.8,
+      "bazaarSellPrice": 4.8,
+      "bazaarBuyPrice": 8.2,
+      "source": "bazaar",
+      "timestamp": 1771108032232,
+      "itemName": "Wheat",
+      "lastUpdated": "2026-02-14T22:27:12.232Z"
+    },
+    "strawberry_hedgehog_skin": {
+      "auction": 80000000,
+      "timestamp": 1771108060493,
+      "itemName": "Strawberry Hedgehog Skin",
+      "lastUpdated": "2026-02-14T22:27:40.493Z"
+    },
+    "enchanted_diamond_block": {
+      "auction": 170818.3,
+      "timestamp": 1771108078767,
+      "itemName": "Enchanted Diamond Block",
+      "lastUpdated": "2026-02-14T22:27:58.767Z"
+    },
+    "diamond": {
+      "auction": 1,
+      "bazaarSellPrice": 1,
+      "bazaarBuyPrice": 11,
+      "source": "bazaar",
+      "timestamp": 1771108366515,
+      "itemName": "Diamond",
+      "lastUpdated": "2026-02-14T22:32:46.515Z"
+    },
+    "black_diamond": {
+      "auction": null,
+      "timestamp": 1771108840740,
+      "itemName": "Black Diamond",
+      "lastUpdated": "2026-02-14T22:40:40.740Z"
+    }
+  }
+}
