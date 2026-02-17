@@ -55,9 +55,10 @@ function loadConfig() {
 function loadItems() {
     try {
         const data = fs.readFileSync(ITEMS_FILE, 'utf8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        return parsed;
     } catch {
-        return { items: [], lastUpdated: 0 };
+        return { items: [], itemMap: [], lastUpdated: 0 };
     }
 }
 
@@ -134,7 +135,23 @@ const PRICE_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 const ITEMS_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for items
 
 function getItemKey(itemName) {
-    return itemName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    return itemName.toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+}
+
+function mapToCoflnetTag(internalId) {
+    // Handle special rune mapping
+    if (internalId.includes('RUNE;')) {
+        const runeMatch = internalId.match(/^([A-Z_]+)_RUNE;(\d+)$/);
+        if (runeMatch) {
+            const runeType = runeMatch[1];
+            return `UNIQUE_RUNE_${runeType}`;
+        }
+    }
+
+    // For all other items, return the internal ID as-is
+    return internalId;
 }
 
 function roundToTenth(num) {
@@ -143,52 +160,40 @@ function roundToTenth(num) {
 
 async function fetchBazaarPrice(itemName) {
     try {
-        const response = await fetch(`https://api.hypixel.net/v2/skyblock/bazaar`);
+        // Use Coflnet API for bazaar data
+        const itemsData = loadItems();
+        const itemMap = itemsData.itemMap || [];
+        const itemInfo = itemMap.find(item => item.name === itemName);
+
+        if (!itemInfo) {
+            console.log(`Item ${itemName} not found in item map for bazaar lookup`);
+            return null;
+        }
+
+        const itemTag = mapToCoflnetTag(itemInfo.internalId);
+        const response = await fetch(`https://sky.coflnet.com/api/bazaar/${itemTag}/snapshot`);
+
         if (!response.ok) {
-            console.error('Failed to fetch bazaar data:', response.status);
+            console.error('Failed to fetch Coflnet bazaar data:', response.status);
             return null;
         }
 
         const data = await response.json();
-        if (!data.success || !data.products) {
-            console.error('Failed to fetch bazaar data:', data.cause);
+
+        if (!data || !data.productId) {
+            console.log(`Item ${itemName} not found in Coflnet bazaar`);
             return null;
         }
 
-        // Find the item in bazaar by exact match only
-        const itemKey = getItemKey(itemName);
-        let bazaarItem = null;
-
-        // Try to find exact match only
-        for (const [productId, product] of Object.entries(data.products)) {
-            if (product.product_id && (
-                product.product_id.toLowerCase() === itemKey ||
-                product.product_id.toLowerCase().replace(/_/g, ' ') === itemName.toLowerCase()
-            )) {
-                bazaarItem = product;
-                break;
-            }
-        }
-
-        // No partial matching - only exact matches allowed
-
-        if (!bazaarItem || !bazaarItem.quick_status) {
-            console.log(`Item ${itemName} not found in bazaar`);
-            return null;
-        }
-
-        const sellPrice = roundToTenth(bazaarItem.quick_status.sellPrice); // What players sell to bazaar for
-        const buyPrice = roundToTenth(bazaarItem.quick_status.buyPrice);   // What players buy from bazaar for
-
-        console.log(`Found bazaar prices for ${itemName}: sell=${sellPrice}, buy=${buyPrice}`);
+        console.log(`Found Coflnet bazaar prices for ${itemName}: buy=${data.buyPrice}, sell=${data.sellPrice}`);
 
         return {
-            sellPrice: sellPrice,
-            buyPrice: buyPrice,
+            sellPrice: roundToTenth(data.sellPrice), // What players sell to bazaar for
+            buyPrice: roundToTenth(data.buyPrice),   // What players buy from bazaar for
             source: 'bazaar'
         };
     } catch (error) {
-        console.error('Error fetching bazaar price:', error);
+        console.error('Error fetching Coflnet bazaar price:', error);
         return null;
     }
 }
@@ -206,64 +211,68 @@ async function fetchLowestBin(apiKey, itemName) {
     }
 
     try {
-        const config = loadConfig();
-        const apiKeyToUse = apiKey || config.apiKey;
+        console.log(`Fetching auction price for: ${itemName}`);
 
-        if (!apiKeyToUse) {
-            console.log('No API key available for fetching auction data');
+        // Use Coflnet API endpoint
+        const itemsData = loadItems();
+        const itemMap = itemsData.itemMap || [];
+        const itemInfo = itemMap.find(item => item.name === itemName);
+
+        if (!itemInfo) {
+            console.log(`Item ${itemName} not found in item map`);
             return cachedPrice || null;
         }
 
-        console.log(`Fetching auction price for: ${itemName}`);
+        const itemTag = mapToCoflnetTag(itemInfo.internalId);
 
-        // Use the auction endpoint - we need to search through pages but with early termination
-        let auctionPrice = null;
-        let page = 0;
-        const maxPages = 10; // Limit to first 10 pages for performance
+        // Try both RUNE_ and UNIQUE_RUNE_ prefixes for runes
+        let coflnetUrl = `https://sky.coflnet.com/api/auctions/tag/${itemTag}/active/bin`;
+        let data = null;
 
-        while (page < maxPages && auctionPrice === null) {
-            const searchUrl = `https://api.hypixel.net/v2/skyblock/auctions?key=${apiKeyToUse}&page=${page}&limit=100`;
-
-            const response = await fetch(searchUrl);
-            if (!response.ok) {
-                console.error(`Failed to fetch auction page ${page}:`, response.status);
-                break;
+        try {
+            const response = await fetch(coflnetUrl);
+            if (response.ok) {
+                data = await response.json();
             }
+        } catch (error) {
+            console.log(`Failed to fetch ${itemTag}, trying alternative...`);
+        }
 
-            const data = await response.json();
-            if (!data.success || !data.auctions) {
-                console.error(`Failed to fetch auction page ${page}:`, data.cause);
-                break;
+        // If first attempt failed and it's a rune with UNIQUE_RUNE_ prefix, try RUNE_ prefix
+        if (!data || data.length === 0) {
+            if (itemTag.startsWith('UNIQUE_RUNE_')) {
+                const alternativeTag = itemTag.replace('UNIQUE_RUNE_', 'RUNE_');
+                coflnetUrl = `https://sky.coflnet.com/api/auctions/tag/${alternativeTag}/active/bin`;
+                try {
+                    const response = await fetch(coflnetUrl);
+                    if (response.ok) {
+                        data = await response.json();
+                        if (data && data.length > 0) {
+                            console.log(`Successfully used alternative tag: ${alternativeTag}`);
+                        }
+                    }
+                } catch (error) {
+                    console.log(`Alternative tag ${alternativeTag} also failed`);
+                }
             }
+        }
 
-            // Find exact match only - no partial matches
-            const exactMatch = data.auctions.find(a =>
-                a.item_name &&
-                a.item_name.toLowerCase() === itemName.toLowerCase() &&
-                a.bin &&
-                a.starting_bid > 0
+        // Find the lowest price from the active BIN auctions
+        let lowestPrice = null;
+        if (data && data.length > 0) {
+            const validAuctions = data.filter(auction =>
+                auction &&
+                auction.startingBid &&
+                auction.startingBid > 0
             );
 
-            if (exactMatch) {
-                auctionPrice = exactMatch.starting_bid;
-                console.log(`Found exact match: ${exactMatch.item_name} for ${auctionPrice} coins`);
-                break;
+            if (validAuctions.length > 0) {
+                lowestPrice = Math.min(...validAuctions.map(a => a.startingBid));
             }
-
-            // No partial matching - only exact matches allowed
-
-            // Debug: Log some sample items from this page
-            if (page === 0) {
-                console.log(`Page ${page} has ${data.auctions.length} auctions`);
-                const sampleItems = data.auctions.slice(0, 5).map(a => a.item_name).join(', ');
-                console.log(`Sample items: ${sampleItems}`);
-            }
-
-            page++;
         }
 
         // If no auction price found, try bazaar as fallback
-        if (auctionPrice === null) {
+        if (lowestPrice === null) {
             console.log(`No auction price found for ${itemName}, trying bazaar...`);
             const bazaarData = await fetchBazaarPrice(itemName);
 
@@ -286,8 +295,32 @@ async function fetchLowestBin(apiKey, itemName) {
             }
         }
 
+        // If still no price found and it's a rune, try NPC price
+        if (lowestPrice === null && itemName.includes('◆')) {
+            console.log(`No auction/bazaar price found for rune ${itemName}, trying NPC price...`);
+
+            if (itemInfo) {
+                const npcPrice = await fetchNpcPrice(itemInfo.internalId);
+                if (npcPrice && npcPrice > 0) {
+                    const priceData = {
+                        auction: npcPrice,
+                        source: 'npc',
+                        timestamp: Date.now(),
+                        itemName,
+                        lastUpdated: new Date().toISOString()
+                    };
+
+                    prices.prices = prices.prices || {};
+                    prices.prices[itemKey] = priceData;
+                    console.log(`Using NPC price for ${itemName}:`, priceData);
+                    savePrices(prices);
+                    return priceData;
+                }
+            }
+        }
+
         const priceData = {
-            auction: auctionPrice,
+            auction: lowestPrice,
             source: 'auction',
             timestamp: Date.now(),
             itemName,
@@ -348,21 +381,13 @@ app.put('/api/prices', (req, res) => {
 });
 
 app.get('/api/price/:itemName', async (req, res) => {
-    const config = loadConfig();
-    const apiKey = config.apiKey;
     const itemName = req.params.itemName;
 
-    if (!apiKey) {
-        return res.status(400).json({ error: 'API key required' });
-    }
-
-    const price = await fetchLowestBin(apiKey, itemName);
+    const price = await fetchLowestBin(null, itemName);
     res.json({ price });
 });
 
 app.post('/api/refresh-all', async (req, res) => {
-    const config = loadConfig();
-    const apiKey = config.apiKey;
     const entries = loadEntries();
     const prices = loadPrices();
 
@@ -376,8 +401,8 @@ app.post('/api/refresh-all', async (req, res) => {
         let price = cachedPrice?.price;
         const age = cachedPrice?.timestamp ? Date.now() - cachedPrice.timestamp : Infinity;
 
-        if (age >= PRICE_CACHE_DURATION && apiKey) {
-            price = await fetchLowestBin(apiKey, itemName);
+        if (age >= PRICE_CACHE_DURATION) {
+            price = await fetchLowestBin(null, itemName);
         }
 
         results[itemName] = price;

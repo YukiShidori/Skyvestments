@@ -1,63 +1,115 @@
 {
   "prices": {
-    "enchanted": {
-      "auction": null,
+    "_bite_rune_iii": {
+      "auction": 10000,
       "source": "auction",
-      "timestamp": 1771107978761,
-      "itemName": "Enchanted",
-      "lastUpdated": "2026-02-14T22:26:18.761Z"
+      "timestamp": 1771367120767,
+      "itemName": "◆ Bite Rune III",
+      "lastUpdated": "2026-02-17T22:25:20.767Z"
     },
-    "enchanted_bone": {
-      "auction": 750.4,
-      "bazaarSellPrice": 750.4,
-      "bazaarBuyPrice": 884.6,
-      "source": "bazaar",
-      "timestamp": 1771108009546,
-      "itemName": "Enchanted Bone",
-      "lastUpdated": "2026-02-14T22:26:49.546Z"
-    },
-    "dragon_egg": {
-      "auction": null,
+    "_flowery_carpet_rune_iii": {
+      "auction": 70000000,
       "source": "auction",
-      "timestamp": 1771108016193,
-      "itemName": "Dragon Egg",
-      "lastUpdated": "2026-02-14T22:26:56.193Z"
-    },
-    "wheat": {
-      "auction": 4.8,
-      "bazaarSellPrice": 4.8,
-      "bazaarBuyPrice": 8.2,
-      "source": "bazaar",
-      "timestamp": 1771108032232,
-      "itemName": "Wheat",
-      "lastUpdated": "2026-02-14T22:27:12.232Z"
+      "timestamp": 1771367129969,
+      "itemName": "◆ Flowery Carpet Rune III",
+      "lastUpdated": "2026-02-17T22:25:29.969Z"
     },
     "strawberry_hedgehog_skin": {
-      "auction": 80000000,
-      "timestamp": 1771108060493,
+      "auction": 79000000,
+      "timestamp": 1771367205401,
       "itemName": "Strawberry Hedgehog Skin",
-      "lastUpdated": "2026-02-14T22:27:40.493Z"
+      "lastUpdated": "2026-02-17T22:26:45.401Z"
     },
-    "enchanted_diamond_block": {
-      "auction": 170818.3,
-      "timestamp": 1771108078767,
-      "itemName": "Enchanted Diamond Block",
-      "lastUpdated": "2026-02-14T22:27:58.767Z"
+    "gold_gift_talisman": {
+      "auction": 9490000,
+      "timestamp": 1771367205488,
+      "itemName": "Gold Gift Talisman",
+      "lastUpdated": "2026-02-17T22:26:45.488Z"
+    },
+    "black_ice_dye": {
+      "auction": 15000000,
+      "timestamp": 1771367205576,
+      "itemName": "Black Ice Dye",
+      "lastUpdated": "2026-02-17T22:26:45.576Z"
+    },
+    "_peafowl_rune_iii": {
+      "auction": 26999900,
+      "timestamp": 1771367205675,
+      "itemName": "◆ Peafowl Rune III",
+      "lastUpdated": "2026-02-17T22:26:45.675Z"
+    },
+    "_turkey_rune_iii": {
+      "auction": 29999999,
+      "timestamp": 1771367205769,
+      "itemName": "◆ Turkey Rune III",
+      "lastUpdated": "2026-02-17T22:26:45.769Z"
+    },
+    "_soul_slice_rune_iii": {
+      "auction": 60000000,
+      "timestamp": 1771367205851,
+      "itemName": "◆ Soul Slice Rune III",
+      "lastUpdated": "2026-02-17T22:26:45.851Z"
+    },
+    "_grand_leafing_rune_iii": {
+      "auction": 137990000,
+      "timestamp": 1771367205971,
+      "itemName": "◆ Grand Leaf-ing Rune III",
+      "lastUpdated": "2026-02-17T22:26:45.971Z"
+    },
+    "moonbloom_mooshroom_cow_skin": {
+      "auction": 38999999,
+      "timestamp": 1771367206054,
+      "itemName": "Moonbloom Mooshroom Cow Skin",
+      "lastUpdated": "2026-02-17T22:26:46.054Z"
+    },
+    "crystal_glacite_golem_skin": {
+      "auction": 25000000,
+      "timestamp": 1771367206135,
+      "itemName": "Crystal Glacite Golem Skin",
+      "lastUpdated": "2026-02-17T22:26:46.135Z"
+    },
+    "catgirl_black_cat_skin": {
+      "auction": 92000000,
+      "timestamp": 1771367206217,
+      "itemName": "Catgirl Black Cat Skin",
+      "lastUpdated": "2026-02-17T22:26:46.217Z"
+    },
+    "decoy": {
+      "auction": null,
+      "timestamp": 1771367370937,
+      "itemName": "Decoy",
+      "lastUpdated": "2026-02-17T22:29:30.937Z"
+    },
+    "block_of_gold": {
+      "auction": null,
+      "source": "auction",
+      "timestamp": 1771367552086,
+      "itemName": "Block of Gold",
+      "lastUpdated": "2026-02-17T22:32:32.086Z"
     },
     "diamond": {
-      "auction": 1,
-      "bazaarSellPrice": 1,
-      "bazaarBuyPrice": 11,
+      "auction": 5.3,
+      "bazaarSellPrice": 5.3,
+      "bazaarBuyPrice": 8.9,
       "source": "bazaar",
-      "timestamp": 1771108366515,
+      "timestamp": 1771367591210,
       "itemName": "Diamond",
-      "lastUpdated": "2026-02-14T22:32:46.515Z"
+      "lastUpdated": "2026-02-17T22:33:11.210Z"
     },
-    "black_diamond": {
-      "auction": null,
-      "timestamp": 1771108840740,
-      "itemName": "Black Diamond",
-      "lastUpdated": "2026-02-14T22:40:40.740Z"
+    "enchanted_diamond_block": {
+      "auction": 202656.4,
+      "bazaarSellPrice": 202656.4,
+      "bazaarBuyPrice": 204913.4,
+      "source": "bazaar",
+      "timestamp": 1771367598075,
+      "itemName": "Enchanted Diamond Block",
+      "lastUpdated": "2026-02-17T22:33:18.075Z"
+    },
+    "enchanted_ancient_claw": {
+      "auction": 30928,
+      "timestamp": 1771367664925,
+      "itemName": "Enchanted Ancient Claw",
+      "lastUpdated": "2026-02-17T22:34:24.925Z"
     }
   }
 }

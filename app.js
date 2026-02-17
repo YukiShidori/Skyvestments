@@ -6,6 +6,25 @@ let prices = {};
 let apiKey = '';
 let allItems = [];
 
+// Dark mode functionality
+function initDarkMode() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    }
+}
+
+function toggleDarkMode() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
 async function loadData() {
     try {
         const configResponse = await fetch('/api/config');
@@ -61,7 +80,9 @@ function formatNumber(num) {
 }
 
 function getItemKey(itemName) {
-    return itemName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    return itemName.toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
 }
 
 function getGroupedPurchases(itemName) {
@@ -79,11 +100,6 @@ function getGroupedPurchases(itemName) {
 }
 
 async function fetchLowestBin(itemName) {
-    if (!apiKey) {
-        console.warn('No API key set');
-        return null;
-    }
-
     const itemKey = getItemKey(itemName);
     const cachedPrice = prices[itemKey];
 
@@ -96,7 +112,7 @@ async function fetchLowestBin(itemName) {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/price/${encodeURIComponent(itemName)}?apiKey=${apiKey}`);
+        const response = await fetch(`${API_BASE}/price/${encodeURIComponent(itemName)}`);
         const data = await response.json();
 
         if (data.price !== null) {
@@ -237,7 +253,14 @@ function showPriceTooltip(e, itemName) {
 
     if (priceData?.auction) {
         const source = priceData.source || 'auction';
-        const sourceLabel = source === 'bazaar' ? 'Bazaar Sell Price' : 'Auction (BIN)';
+        let sourceLabel = 'Auction (BIN)';
+
+        if (source === 'bazaar') {
+            sourceLabel = 'Bazaar Sell Price';
+        } else if (source === 'npc') {
+            sourceLabel = 'NPC Sell Price';
+        }
+
         content += `<div class="tooltip-entry">${sourceLabel}: ${formatNumber(priceData.auction)}</div>`;
 
         if (source === 'bazaar' && priceData.bazaarBuyPrice) {
@@ -431,6 +454,9 @@ function importEntries(event) {
 }
 
 async function init() {
+    // Initialize dark mode first
+    initDarkMode();
+
     await loadData();
 
     document.getElementById('entryForm').addEventListener('submit', async (e) => {
@@ -468,16 +494,16 @@ async function init() {
         await refreshItems();
     }
 
+    if (entries.length > 0) {
+        await refreshAllPrices();
+    }
+
     renderPortfolio();
 
     setInterval(async () => {
         await refreshAllPrices();
         renderPortfolio();
     }, PRICE_CACHE_DURATION);
-
-    if (entries.length > 0 && apiKey) {
-        refreshAllPrices();
-    }
 }
 
 init();

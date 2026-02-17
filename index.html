@@ -7,74 +7,99 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+
     <div class="container">
         <header>
             <h1>Skyvestments</h1>
             <p>Hypixel Skyblock Investment Tracker</p>
         </header>
 
-        <section class="add-entry">
-            <h2>Add Investment</h2>
-            <form id="entryForm">
-                <div class="form-group">
-                    <label for="itemName">Item Name</label>
-                    <div class="autocomplete-wrapper">
-                        <input type="text" id="itemName" placeholder="e.g., Enchanted Diamond Block" required>
-                        <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+        <main>
+            <section class="add-entry">
+                <h2>Add Investment</h2>
+                <form id="entryForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="itemName">Item Name</label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="itemName" placeholder="e.g., Enchanted Diamond Block" required>
+                                <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="buyPrice">Buy Price (coins)</label>
+                            <input type="number" id="buyPrice" placeholder="e.g., 1000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" placeholder="e.g., 64" required min="1">
+                        </div>
+                    </div>
+                    <button type="submit">Add Entry</button>
+                </form>
+            </section>
+
+            <section class="portfolio">
+                <div class="section-header">
+                    <h2>Your Index</h2>
+                    <div class="portfolio-header">
+                        <button id="refreshBtn" class="secondary-btn">Refresh Prices</button>
+                        <button id="exportBtn" class="secondary-btn">Export Entries</button>
+                        <button id="importBtn" class="secondary-btn">Import Entries</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="buyPrice">Buy Price (coins)</label>
-                    <input type="number" id="buyPrice" placeholder="e.g., 1000000" required>
-                </div>
-                <div class="form-group">
-                    <label for="quantity">Quantity</label>
-                    <input type="number" id="quantity" placeholder="e.g., 64" required min="1">
-                </div>
-                <button type="submit">Add Entry</button>
-            </form>
-        </section>
 
-        <section class="portfolio">
-            <h2>Your Index</h2>
-            <div class="portfolio-header">
-                <button id="refreshBtn">Refresh Prices</button>
-                <button id="exportBtn">Export Entries</button>
-                <button id="importBtn">Import Entries</button>
-                <input type="file" id="importFile" accept=".json" style="display: none;">
-            </div>
-            <div class="portfolio-summary">
-                <div class="summary-item">
-                    <span class="label">Total Invested</span>
-                    <span class="value" id="totalInvested">0 coins</span>
+                <div class="portfolio-summary">
+                    <div class="summary-item">
+                        <span class="label">Total Invested</span>
+                        <span class="value" id="totalInvested">0 coins</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Current Value</span>
+                        <span class="value" id="currentValue">0 coins</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Profit/Loss</span>
+                        <span class="value" id="profitLoss">0 coins</span>
+                    </div>
                 </div>
-                <div class="summary-item">
-                    <span class="label">Current Value</span>
-                    <span class="value" id="currentValue">0 coins</span>
+
+                <div class="portfolio-table-container">
+                    <table class="portfolio-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Avg Buy Price</th>
+                                <th>Total Bought At</th>
+                                <th>Current Value</th>
+                                <th>Profit/Loss</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolioBody">
+                        </tbody>
+                    </table>
                 </div>
-                <div class="summary-item">
-                    <span class="label">Profit/Loss</span>
-                    <span class="value" id="profitLoss">0 coins</span>
-                </div>
-            </div>
-            <div class="portfolio-table-container">
-                <table class="portfolio-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Quantity</th>
-                            <th>Avg Buy Price</th>
-                            <th>Total Bought At</th>
-                            <th>Current Value</th>
-                            <th>Profit/Loss</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="portfolioBody">
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            </section>
+        </main>
     </div>
 
     <div id="tooltip" class="tooltip"></div>
